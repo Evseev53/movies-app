@@ -7,6 +7,7 @@ export default class MoviesList extends Component {
 
     render() {
         const { data } = this.props;
+        const sixFilms = data.filter((el, indx) => indx < 6);
 
         return(
             <List
@@ -14,7 +15,7 @@ export default class MoviesList extends Component {
                     column: 2,
                     gutter: [37]
                 }}
-                dataSource={data}
+                dataSource={ sixFilms }
                 renderItem={(item) => (
                     <List.Item>
                         <Movie data={item}/>

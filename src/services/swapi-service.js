@@ -3,7 +3,14 @@ export default class SwapiServiсe {
     _key = `730b339fc98ae35184a11b9f24628740`;
 
     async getMovies(name) {
-        const res = await fetch(`${this._apiBase}?api_key=${this._key}&query=${name}`);
-        return await res.json();
+        try {
+            const res = await fetch(`${this._apiBase}?api_key=${this._key}&query=${name}`);
+            if (!res.ok) {
+                throw Error(`Получен ответ от сервера: ${res.status}`);
+            }
+            return await res.json();
+        } catch (err) {
+            throw Error('Нет доступа к сервису');
+        }
     }
 }

@@ -31,6 +31,7 @@ export default class Movie extends Component {
                 }
             >
                 <Meta
+                    className="meta"
                     title={ title }
                     description={ date }
                 />
