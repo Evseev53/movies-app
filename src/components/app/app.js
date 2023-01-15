@@ -3,7 +3,8 @@ import { format, parseISO } from 'date-fns';
 import './app.css';
 import MoviesList from "../movies-list/movies-list";
 import SwapiServiсe from "../../services/swapi-service";
-import { Spin, Alert } from "antd";
+import { Spin, Alert, Input, Pagination } from "antd";
+import { debounce } from "lodash";
 
 export default class App extends Component{
 
@@ -13,9 +14,9 @@ export default class App extends Component{
             data: [],
             loading: true,
             error: false,
-            errorText: null
+            errorText: null,
+            request: ''
         };
-        this.searchMovies();
     }
 
     swapiServiсe = new SwapiServiсe();
@@ -23,7 +24,11 @@ export default class App extends Component{
     urlImages = 'https://image.tmdb.org/t/p/original/';
 
     formatDate(date) {
-        return format(parseISO(date), "MMMM d',' yyyy");
+        try {
+            return format(parseISO(date), "MMMM d',' yyyy");
+        } catch {
+            return 'No Date';
+        }
     }
 
     reduceText(text, value) {
@@ -35,7 +40,6 @@ export default class App extends Component{
 
     onError(err) {
         console.error('onError:', err);
-        console.log(this.state);
         this.setState({
                 loading: false,
                 error: true,
@@ -44,13 +48,14 @@ export default class App extends Component{
         )
     }
 
-    searchMovies() {
+    searchMovies(value, page) {
         this.swapiServiсe
-            .getMovies('back')
+            .getMovies(value, page)
             .then(movies => {
                 if (!movies.results.length) {
                     throw Error('Фильм не найден');
                 }
+                this.setState({data: []});
                 movies.results.forEach( movie => {
                 this.setState((state) => {
                     const { data } = state;
@@ -77,27 +82,52 @@ export default class App extends Component{
             }).catch(this.onError.bind(this))
     }
 
+    debouncedSearch = debounce( (value, page) => {
+        this.searchMovies(value, page);
+    }, 1000);
+
+    onInput = (e) => {
+        const request = e.target.value;
+        this.setState({request: request})
+        this.debouncedSearch(request);
+    }
+
+    onPagination = (e) => {
+        const { request } = this.state;
+        this.debouncedSearch(request, e);
+    }
+
     render() {
         const { data, loading, error } = this.state;
         const hadData = !(loading || error);
 
         const errorMessage = error ?
             <Alert
-                message="Что-то пошло не так:"
+                message="Ой!"
                 description={ this.state.errorText }
                 type="error"
-                closable
+                className="error-alert"
             />
             : null;
+
+        const pagination = hadData ? <Pagination defaultCurrent={1} total={50} onChange={ this.onPagination }/> : null;
 
         const content = hadData ? <MoviesList data = { data }/> : null;
         const spin = loading ? <Spin tip="Loading" size="large" className="loading"/> : null;
 
         return (
-            <div>
-                { content }
-                { spin }
-                { errorMessage }
+            <div className="container">
+                <div className="input-container">
+                    <Input placeholder="Type to search..." onChange={this.onInput}/>
+                </div>
+                <div className="movies-container">
+                    { content }
+                    { spin }
+                    { errorMessage }
+                </div>
+                <div className="pagination-container">
+                    { pagination }
+                </div>
             </div>
         );
     }

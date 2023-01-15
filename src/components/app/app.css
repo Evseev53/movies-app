@@ -1,5 +1,33 @@
 .loading {
-    position: absolute;
-    top: 50%;
+    position: relative;
+    top: 100%;
     left: 50%;
+}
+
+.input-container {
+    max-width: 938px;
+    margin: 0 auto 0 auto;
+}
+
+.error-alert {
+    max-width: 300px;
+    position: absolute;
+    left: 40%;
+}
+
+.container {
+    max-width: 1010px;
+    min-height: 1147px;
+    background-color: white;
+    padding: 15px 36px 15px 36px;
+    margin: 0 auto 0 auto;
+}
+
+.movies-container {
+    padding: 32px 0 32px 0;
+}
+
+.pagination-container {
+    position: absolute;
+    left: 40%;
 }
