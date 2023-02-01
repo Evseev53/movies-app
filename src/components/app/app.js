@@ -3,83 +3,67 @@ import { format, parseISO } from 'date-fns';
 import './app.css';
 import MoviesList from "../movies-list/movies-list";
 import SwapiServiсe from "../../services/swapi-service";
-import { Spin, Alert, Input, Pagination } from "antd";
+import { GenresProvider, RateMovieProvider } from "../swapi-service-context/swapi-service-context";
+import { Spin, Alert, Input, Pagination, Tabs } from "antd";
 import { debounce } from "lodash";
+import ListAndPagination from "../list-and-pagination/list-and-pagination";
 
-export default class App extends Component{
+export default class App extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            data: [],
-            loading: true,
+            movies: null,
+            favoriteMovies: null,
             error: false,
             errorText: null,
-            request: ''
+            loading: true,
+            request: '',
+            genres: null,
+            sessionId: null
         };
     }
 
     swapiServiсe = new SwapiServiсe();
 
-    urlImages = 'https://image.tmdb.org/t/p/original/';
+    componentDidMount() {
+        this.swapiServiсe
+            .getListOfGenres()
+            .then(genres => {
+                this.setState({
+                    genres: genres.genres
+                })
+            })
+            .catch(e => this.onError(e))
+        this.swapiServiсe
+            .startGuestSession()
+            .then(obj => {
+            this.setState({sessionId: obj.guest_session_id})
+            })
+            .catch(e => this.onError(e))
+    };
 
-    formatDate(date) {
-        try {
-            return format(parseISO(date), "MMMM d',' yyyy");
-        } catch {
-            return 'No Date';
-        }
-    }
-
-    reduceText(text, value) {
-        const afterSlice = text.slice(0, value);
-        const afterSplit = afterSlice.split(' ');
-        afterSplit.pop();
-        return afterSplit.join(' ') + ' ...';
-    }
-
-    onError(err) {
-        console.error('onError:', err);
+    onError = (err) => {
         this.setState({
-                loading: false,
-                error: true,
-                errorText: err.message
-            }
-        )
+            loading: false,
+            error: true,
+            errorText: err.message
+        })
     }
 
-    searchMovies(value, page) {
+    searchMovies = (value, page) => {
         this.swapiServiсe
             .getMovies(value, page)
             .then(movies => {
-                if (!movies.results.length) {
-                    throw Error('Фильм не найден');
-                }
-                this.setState({data: []});
-                movies.results.forEach( movie => {
-                this.setState((state) => {
-                    const { data } = state;
-                    const description = this.reduceText(movie.overview, 200);
-                    const date = this.formatDate(movie.release_date);
-                    return {
-                        data: [
-                            ...data,
-                            {
-                                title: movie.original_title,
-                                date: date,
-                                genre: 'undefined',
-                                description: description,
-                                rating: movie.vote_average,
-                                img: this.urlImages + movie.poster_path,
-                                id: movie.id
-                            }
-                        ],
-                        loading: false,
-                        error: false
-                    }
-                })
+                this.setState({movies: movies})
             })
-            }).catch(this.onError.bind(this))
+            .catch(e => this.onError(e))
+    }
+
+    getListOfFavorites = () => {
+        this.swapiServiсe.getListOfFavorites(this.state.sessionId)
+            .then(movies => { this.setState({favoriteMovies: movies}) })
+            .catch(e => this.onError(e))
     }
 
     debouncedSearch = debounce( (value, page) => {
@@ -88,47 +72,86 @@ export default class App extends Component{
 
     onInput = (e) => {
         const request = e.target.value;
-        this.setState({request: request})
+        this.setState({
+            request: request,
+            loading: true,
+            error: false
+        })
         this.debouncedSearch(request);
     }
 
     onPagination = (e) => {
+        this.setState({
+            loading: true,
+            error: false
+        })
         const { request } = this.state;
         this.debouncedSearch(request, e);
     }
 
+    updateStateApp = (key, value) => {
+        this.setState({
+            [key]: value
+        })
+    }
+
     render() {
-        const { data, loading, error } = this.state;
-        const hadData = !(loading || error);
-
-        const errorMessage = error ?
-            <Alert
-                message="Ой!"
-                description={ this.state.errorText }
-                type="error"
-                className="error-alert"
-            />
-            : null;
-
-        const pagination = hadData ? <Pagination defaultCurrent={1} total={50} onChange={ this.onPagination }/> : null;
-
-        const content = hadData ? <MoviesList data = { data }/> : null;
-        const spin = loading ? <Spin tip="Loading" size="large" className="loading"/> : null;
-
-        return (
+        const { sessionId, movies, favoriteMovies, error, errorText, loading } = this.state;
+        const searchPage = (
             <div className="container">
                 <div className="input-container">
                     <Input placeholder="Type to search..." onChange={this.onInput}/>
                 </div>
-                <div className="movies-container">
-                    { content }
-                    { spin }
-                    { errorMessage }
-                </div>
-                <div className="pagination-container">
-                    { pagination }
-                </div>
-            </div>
+                <ListAndPagination
+                    movies={ movies }
+                    onPagination={ this.onPagination }
+                    error={ error }
+                    errorText={ errorText }
+                    loading={ loading }
+                    updateStateApp={ this.updateStateApp }
+                    onError={ this.onError }
+                />
+            </div>);
+
+        const ratedPage = (
+            <ListAndPagination
+                movies={ favoriteMovies }
+                onPagination={ this.onPagination }
+                error={ error }
+                errorText={ errorText }
+                loading={ loading }
+                updateStateApp={ this.updateStateApp }
+                getListOfFavorites={ this.getListOfFavorites }
+                onError={ this.onError }
+            />
+        )
+
+        const pages = [
+            {
+                key: '1',
+                label: `Search`,
+                children: searchPage,
+            },
+            {
+                key: '2',
+                label: `Rated`,
+                children: ratedPage
+            },
+        ];
+
+        return (
+            <RateMovieProvider value={ (...arg) => this.swapiServiсe.rateMovie(sessionId, ...arg) }>
+                <GenresProvider value={ this.state.genres }>
+                    <div className="container">
+                        <Tabs
+                            defaultActiveKey="1"
+                            items={pages}
+                            destroyInactiveTabPane='true'
+                            centered="true"
+                        />
+                    </div>
+                </GenresProvider>
+            </RateMovieProvider>
         );
     }
 }

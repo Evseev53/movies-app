@@ -1,0 +1,24 @@
+.genre {
+    display: inline-block;
+    box-sizing: border-box;
+    height: 20px;
+    padding: 0 5px 0 5px;
+    margin-top: 10px;
+    margin-right: 5px;
+    background: #FAFAFA;
+    border: 1px solid #D9D9D9;
+    border-radius: 2px;
+}
+
+.text-genre {
+    display: block;
+    text-align: center;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    /* identical to box height */
+
+
+    color: rgba(0, 0, 0, 0.65);
+}

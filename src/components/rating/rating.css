@@ -1,0 +1,14 @@
+.rating {
+    display: block;
+    border: 2px solid;
+    border-color: #E9D100;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    text-align: center
+}
+
+.rating-value {
+    position: relative;
+    top: 10%;
+}

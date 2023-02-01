@@ -1,17 +1,18 @@
 import {Component} from "react";
+import {RateMovieConsumer} from "../swapi-service-context/swapi-service-context";
+import Poster from "../poster/poster";
 import './movie.css';
-import { Avatar, Card, Descriptions, Image, Col, Row, Typography } from 'antd';
-const { Meta } = Card;
-const { Text } = Typography;
+import { Card, Col, Row } from 'antd';
+import MovieDescription from "../movie-description/movie-description";
 
 export default class Movie extends Component {
 
     render() {
 
-        const { title, date, genre, description, img } = this.props.data;
+        const { title, date, genresId, description, img, rating, id, myRating } = this.props.data;
 
         const cardStyle = {
-            width: 454,
+            width: 480,
             height: 281,
             borderRadius: 0
         };
@@ -22,27 +23,32 @@ export default class Movie extends Component {
                 hoverable
                 bordered={false}
                 style={ cardStyle }
-                cover={
-                    <img
-                        alt="example"
-                        src={ img }
-                        style={{borderRadius: 0, width: 183, height: 281}}
-                    />
-                }
             >
-                <Meta
-                    className="meta"
-                    title={ title }
-                    description={ date }
-                />
-                <div className="genre">
-                    <Text className="text-genre">
-                        { genre }
-                    </Text>
-                </div>
-                <Text className="description">
-                    { description }
-                </Text>
+                <Row>
+                    <Col span={11} className="grid-img">
+                        <Poster img={ img } />
+                    </Col>
+                    <Col span={13} className="grid-content">
+                        <RateMovieConsumer>
+                            {
+                                (rateMovie) => {
+                                    return (
+                                        <MovieDescription
+                                            title={title}
+                                            date={date}
+                                            genresId={genresId}
+                                            description={description}
+                                            rating={rating}
+                                            rateMovie={rateMovie}
+                                            id={id}
+                                            myRating={myRating}
+                                        />
+                                    )
+                                }
+                            }
+                        </RateMovieConsumer>
+                    </Col>
+                </Row>
             </Card>
         )
     }

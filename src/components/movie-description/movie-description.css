@@ -1,0 +1,33 @@
+.movie-description {
+    min-width: 275px;
+    min-height: 250px;
+}
+
+.description {
+    display: inline-block;
+    width: 270px;
+    height: 100%;
+
+    /* @font-size-sm: 12px */
+
+
+    font-size: 12px;
+    line-height: 22px;
+    /* or 183% */
+
+
+    color: #000000;
+}
+
+.movies-container {
+    padding: 32px 0 32px 0;
+}
+
+.pagination-container {
+    position: absolute;
+    left: 40%;
+}
+
+.rate {
+
+}
