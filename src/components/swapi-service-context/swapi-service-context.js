@@ -1,18 +1,18 @@
-import React from "react";
+import React from 'react';
 
 const {
-    Provider: GenresProvider,
-    Consumer: GenresConsumer
+  Provider: GenresProvider,
+  Consumer: GenresConsumer
 } = React.createContext();
 
 const {
-    Provider: RateMovieProvider,
-    Consumer: RateMovieConsumer
+  Provider: RateMovieProvider,
+  Consumer: RateMovieConsumer
 } = React.createContext();
 
 export {
-    GenresProvider,
-    GenresConsumer,
-    RateMovieProvider,
-    RateMovieConsumer
+  GenresProvider,
+  GenresConsumer,
+  RateMovieProvider,
+  RateMovieConsumer
 };

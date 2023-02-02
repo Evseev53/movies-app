@@ -23,3 +23,10 @@
     margin: 0 auto 0 auto;
 }
 
+@media (max-width: 1099px) {
+    .container {
+        max-width: 600px;
+        padding: 5px;
+    }
+}
+

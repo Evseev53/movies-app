@@ -1,3 +1,7 @@
+html {
+    min-width: 500px;
+}
+
 body {
     background: #E5E5E5;
 }

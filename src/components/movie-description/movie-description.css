@@ -1,6 +1,8 @@
 .movie-description {
     min-width: 275px;
-    min-height: 250px;
+    min-height: 85px;
+    max-height: 100px;
+    padding: 10px 5px 0 0;
 }
 
 .description {
@@ -28,6 +30,21 @@
     left: 40%;
 }
 
-.rate {
+.title {
+    display: block;
+    font-size: 20px;
+    line-height: 28px;
+}
 
+.date {
+    font-size: 12px;
+    color: #827E7E;
+}
+
+@media (max-width: 1099px) {
+    .movie-description {
+        min-height: 85px;
+        max-height: 100px;
+        padding-left: 5px;
+    }
 }

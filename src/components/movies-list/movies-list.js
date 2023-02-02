@@ -1,26 +1,33 @@
-import { Component } from "react";
 import './movies-list.css';
-import Movie from "../movie/movie";
 import { List } from 'antd';
 
-export default class MoviesList extends Component {
+import Movie from '../movie/movie';
+import { RateMovieConsumer } from '../swapi-service-context/swapi-service-context';
 
-    render() {
-        const { data } = this.props;
-
-        return(
-            <List
-                grid={{
-                    column: 2,
-                    gutter: [37]
-                }}
-                dataSource={ data }
-                renderItem={(item) => (
-                    <List.Item>
-                        <Movie data={item}/>
-                    </List.Item>
-                )}
-            />
-        )
-    }
+export default function MoviesList ({ data, isMobile }) {
+  return(
+    <List
+      grid={{
+        column: isMobile ? 1 : 2,
+        gutter: [37]
+      }}
+      dataSource={ data }
+      renderItem={(item) => (
+        <List.Item>
+          <RateMovieConsumer>
+            {
+              (rateMovie) => {
+                return (
+                  <Movie
+                    data={ item }
+                    rateMovie={ rateMovie }
+                  />
+                )
+              }
+            }
+          </RateMovieConsumer>
+        </List.Item>
+      )}
+    />
+  )
 }
