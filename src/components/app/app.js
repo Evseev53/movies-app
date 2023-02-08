@@ -12,6 +12,7 @@ export default class App extends Component {
   state = {
     movies: null,
     favoriteMovies: null,
+    ratingAndId: [],
     error: true,
     errorText: 'Введите название фильма',
     loading: false,
@@ -79,6 +80,7 @@ export default class App extends Component {
   }
 
   onError = (err) => {
+    console.error(err);
     this.setState({
       loading: false,
       error: true,
@@ -97,7 +99,9 @@ export default class App extends Component {
 
   getListOfFavorites = (page) => {
     this.swapiServiсe.getListOfFavorites(this.state.sessionId, page)
-      .then(movies => { this.setState({favoriteMovies: movies}) })
+      .then(movies => {
+        this.setState({favoriteMovies: movies});
+      })
       .catch(e => this.onError(e))
   }
 
@@ -130,13 +134,46 @@ export default class App extends Component {
     })
   }
 
+  setRatingAndId = (movieId, value) => {
+    const { ratingAndId } = this.state;
+    let result = JSON.parse(JSON.stringify(ratingAndId));
+    const idFound = result.filter(el => el.id === movieId);
+    if (idFound.length) {
+      result = result.map(el => {
+        if (el.id === movieId) {
+          return {
+            id: movieId,
+            rating: value
+          }
+        }
+        return el;
+      })
+    } else {
+      result.push({
+        id: movieId,
+        rating: value
+      });
+    }
+    this.setState({ratingAndId: result});
+  };
+
+  getRatingById = (movieId) => {
+    const { ratingAndId } = this.state;
+    const arr = ratingAndId.filter(el => el.id === movieId);
+    return arr.length ? arr[0].rating : null;
+  }
+
   render() {
-    const { sessionId, movies, favoriteMovies, error, errorText, loading, isMobile } = this.state;
+    const { sessionId, movies, favoriteMovies, error, errorText, loading, isMobile, request } = this.state;
 
     const searchPage = (
       <div className="container">
         <div className="input-container">
-          <Input placeholder="Type to search..." onChange={this.onInput}/>
+          <Input
+            placeholder="Type to search..."
+            onChange={ this.onInput }
+            defaultValue={ request }
+          />
         </div>
         <ListAndPagination
           movies={ movies }
@@ -147,6 +184,8 @@ export default class App extends Component {
           updateStateApp={ this.updateStateApp }
           onError={ this.onError }
           isMobile={ isMobile }
+          setRatingAndId={ this.setRatingAndId }
+          getRatingById={ this.getRatingById }
         />
       </div>);
 
@@ -161,6 +200,8 @@ export default class App extends Component {
         getListOfFavorites={ this.getListOfFavorites }
         onError={ this.onError }
         isMobile={ isMobile }
+        setRatingAndId={ this.setRatingAndId }
+        getRatingById={ this.getRatingById }
       />
     )
 

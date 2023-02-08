@@ -4,7 +4,7 @@ import { List } from 'antd';
 import Movie from '../movie/movie';
 import { RateMovieConsumer } from '../swapi-service-context/swapi-service-context';
 
-export default function MoviesList ({ data, isMobile }) {
+export default function MoviesList ({ data, isMobile, setRatingAndId }) {
   return(
     <List
       grid={{
@@ -21,6 +21,7 @@ export default function MoviesList ({ data, isMobile }) {
                   <Movie
                     data={ item }
                     rateMovie={ rateMovie }
+                    setRatingAndId={ setRatingAndId }
                   />
                 )
               }

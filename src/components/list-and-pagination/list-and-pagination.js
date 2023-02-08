@@ -61,9 +61,11 @@ export default class ListAndPagination extends Component{
       movies.results.forEach( movie => {
         this.setState((state) => {
           const { data } = state;
+          const { getRatingById } = this.props;
           const description = this.reduceText(movie.overview, 230);
           const date = this.formatDate(movie.release_date);
-          const title = this.reduceText(movie.original_title, 30)
+          const title = this.reduceText(movie.original_title, 30);
+          const rating = getRatingById(movie.id);
           return {
             data: [
               ...data,
@@ -77,7 +79,7 @@ export default class ListAndPagination extends Component{
                   ? 'https://kharkivmebel.com/upload/iblock/fa9/5g7javca9w0ak62rupuq3nnd3dx3dufi.png'
                   : this.urlImages + movie.poster_path,
                 id: movie.id,
-                myRating: movie.rating
+                myRating: rating
               }
             ],
           }
@@ -93,7 +95,7 @@ export default class ListAndPagination extends Component{
 
   render() {
     const { data, page, total } = this.state;
-    const { error, errorText, onPagination, loading, isMobile } = this.props;
+    const { error, errorText, onPagination, loading, isMobile, setRatingAndId } = this.props;
     const hasData = !(loading || error);
 
     const errorMessage = error ?
@@ -108,13 +110,19 @@ export default class ListAndPagination extends Component{
     const pagination = hasData ?
       <Pagination
         defaultCurrent={ page }
+        current={ page }
         total={ total }
         onChange={ onPagination }
         defaultPageSize={ 20 }
       />
       : null;
 
-    const content = hasData ? <MoviesList data = { data } isMobile={ isMobile } /> : null;
+    const content = hasData ? 
+      <MoviesList
+        data = { data }
+        isMobile={ isMobile }
+        setRatingAndId={ setRatingAndId }
+      /> : null;
     const spin = loading ? <Spin tip="Loading" size="large" className="loading"/> : null;
 
     return (

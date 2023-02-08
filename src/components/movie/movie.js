@@ -9,15 +9,15 @@ const { Text } = Typography;
 
 export default class Movie extends Component {
   onChangeRate = (e) => {
-    const { rateMovie } = this.props;
+    const { rateMovie, setRatingAndId } = this.props;
     const { id } = this.props.data;
-    rateMovie(id, e)
+    rateMovie(id, e);
+    setRatingAndId(id, e);
   }
 
   render() {
 
     const { title, date, genresId, description, img, rating, id, myRating } = this.props.data;
-
     return(
       <div
         className="card"
